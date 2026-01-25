@@ -2,12 +2,6 @@ pipeline {
   agent {label 'docker'}
   
   stages {
-    stage('Clone Repo') {
-      steps {
-        git 'https://github.com/ShivamUbale/Nginx-Docker-Jenkins.git'
-      }
-    }
-
     stage('Build & Deploy') {
       steps {
         sh 'chmod +x scripts/build_run.sh'
