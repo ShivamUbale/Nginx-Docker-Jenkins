@@ -114,15 +114,19 @@ docker run -d --name nginx-test -p 8080:80 nginx-test
 pipeline {
     agent { label 'docker' }
 
-    stages {
-        stage('Build & Run Docker') {
-            steps {
-                sh 'chmod +x scripts/build_run.sh'
-                sh 'scripts/build_run.sh'
-                sh 'docker ps'
-            }
-        }
+  stages {
+    stage('Build & Deploy') {
+      steps {
+        sh 'chmod +x scripts/build_run.sh'
+        sh 'scripts/build_run.sh'
+      }
     }
+    stage('Verify') {
+      steps {
+        sh 'docker ps | grep nginx-container'
+      }
+    }
+  }
 }
 ```
 
