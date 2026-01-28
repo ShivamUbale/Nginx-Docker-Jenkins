@@ -60,7 +60,8 @@ nginx-docker-jenkins/
 │   ├── Dockerfile
 │   └── index.html
 │
-├── script.sh
+├── scripts/
+│   └── build_run.sh
 ├── Jenkinsfile
 └── README.md
 ```
@@ -71,27 +72,59 @@ nginx-docker-jenkins/
 
 ### 🔹 `nginx/Dockerfile`
 
-* Uses official Nginx image
-* Copies `index.html` into web root
-* Exposes port 80
+```dockerfile
+FROM nginx:alpine
+COPY index.html /usr/share/nginx/html/index.html
+EXPOSE 80
+```
 
 ### 🔹 `nginx/index.html`
 
-* Simple static webpage
-* Used to verify successful deployment
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jenkins Docker Nginx Test</title>
+</head>
+<body>
+    <h1>Hello, Jenkins CI/CD!</h1>
+</body>
+</html>
+```
 
-### 🔹 `script.sh`
+### 🔹 `scripts/build_run.sh`
 
-* Automates Docker build and run
-* Stops old containers safely
-* Ensures clean redeployment
+```bash
+#!/bin/bash
+
+# Stop old container if running
+docker stop nginx-test || true
+docker rm nginx-test || true
+
+# Build Docker image
+docker build -t nginx-test ./nginx
+
+# Run container
+docker run -d --name nginx-test -p 8080:80 nginx-test
+```
 
 ### 🔹 `Jenkinsfile`
 
-* Defines pipeline stages
-* Uses **node-02** as agent
-* Pulls code from GitHub
-* Executes Docker commands
+```groovy
+pipeline {
+    agent { label 'docker' }
+
+    stages {
+        stage('Build & Run Docker') {
+            steps {
+                sh 'chmod +x scripts/build_run.sh'
+                sh 'scripts/build_run.sh'
+                sh 'docker ps'
+            }
+        }
+    }
+}
+```
 
 ---
 
@@ -156,36 +189,41 @@ Branch: */main
 node-02
 ```
 
+### Script Path
+
+```
+Jenkinsfile
+```
+
 ---
 
-## 🌐 Output
+## 🌐 Output Verification
 
-After a successful build:
+After a successful build, check:
 
-* Docker container runs on **node-02**
-* Nginx serves the web page
-* App is accessible via browser
+* Docker container running:
 
-Example:
+```bash
+docker ps
+```
+
+* Web page in browser:
 
 ```
 http://<node-02-ip>:8080
 ```
 
----
+### Suggested Screenshots
 
-## 📸 Suggested Screenshots (Highly Recommended)
+| Screenshot                                       | Description                                   |
+| ------------------------------------------------ | --------------------------------------------- |
+| ![Screenshot1](screenshots/jenkins-pipeline.png) | Jenkins pipeline configuration page           |
+| ![Screenshot2](screenshots/build-console.png)    | Jenkins console output after successful build |
+| ![Screenshot3](screenshots/node-02-online.png)   | Node-02 online status in Jenkins              |
+| ![Screenshot4](screenshots/docker-ps.png)        | Docker container running on node-02           |
+| ![Screenshot5](screenshots/browser-output.png)   | Nginx web page displayed in browser           |
 
-Add these screenshots to make the project more professional:
-
-1. **GitHub Repository Structure**
-2. **Jenkins Pipeline Configuration Page**
-3. **Jenkins Successful Build Console Output**
-4. **Nodes Page Showing node-02 ONLINE**
-5. **Docker Containers Running on node-02 (`docker ps`)**
-6. **Web App Output in Browser**
-
-> 📁 Store screenshots inside a `/screenshots` folder
+> 📁 Place all screenshots inside a `/screenshots` folder
 
 ---
 
@@ -219,16 +257,3 @@ Add these screenshots to make the project more professional:
 Aspiring DevOps Engineer
 
 ---
-
-## ⭐ Final Notes
-
-This project is intentionally simple but **architecturally correct**.
-
-It’s perfect for:
-
-* Freshers
-* DevOps learners
-* Resume projects
-* Interview discussions
-
-If you understand this project end-to-end, you are **already ahead of many beginners**.
