@@ -1,237 +1,234 @@
-# Jenkins CI Pipeline with Docker & Nginx (Agent-Based)
+# 🚀 Jenkins CI/CD Pipeline – Dockerized Nginx Web App
 
-This project demonstrates a **real-world Jenkins CI pipeline** where Docker-based builds are executed on a **dedicated Jenkins agent (node-02)**.  
-The pipeline builds and runs an **Nginx Docker container** that serves a static HTML page.
+A **beginner-to-intermediate DevOps project** demonstrating a real-world CI/CD workflow using **GitHub, Jenkins, Docker, and Nginx** with a **dedicated Jenkins agent (node-02)**.
 
-This project is intentionally focused on **CI fundamentals**, clean agent usage, and Docker execution — without overloading with Kubernetes or Docker Hub.
-
----
-
-## What This Project Does
-
-- Jenkins pulls code from GitHub
-- Jenkins controller schedules the job
-- Jenkins agent (node-02) executes Docker commands
-- Docker builds an Nginx image
-- Docker runs a container
-- Nginx serves an HTML page in the browser
+This project is designed to be **clean, professional, reusable**, and easy for others to understand and extend.
 
 ---
 
-## Tech Stack
+## 📌 Project Overview
 
-- Jenkins (Controller + Agent)
-- Docker
-- Nginx
-- Git & GitHub
-- Linux
-- Shell scripting
+This project automates the process of:
+
+1. Pulling source code from **GitHub**
+2. Building a **Docker image** with **Nginx**
+3. Serving a static **HTML website**
+4. Running everything via a **Jenkins Pipeline** on a **remote Jenkins agent (node-02)**
+
+It follows **real DevOps practices** like:
+
+* Agent-based execution
+* Secure GitHub authentication (PAT)
+* Script-based Docker automation
 
 ---
 
-## Project Structure
+## 🧱 Architecture
 
+```
+Developer → GitHub → Jenkins Controller
+                     ↓
+               Jenkins Agent (node-02)
+                     ↓
+                 Docker Engine
+                     ↓
+                  Nginx Container
+                     ↓
+                Web App in Browser
+```
+
+---
+
+## 🛠️ Tech Stack
+
+| Tool    | Purpose                |
+| ------- | ---------------------- |
+| GitHub  | Source code repository |
+| Jenkins | CI/CD automation       |
+| Docker  | Containerization       |
+| Nginx   | Web server             |
+| Linux   | Jenkins nodes          |
+
+---
+
+## 📁 Repository Structure
+
+```
 nginx-docker-jenkins/
-├── Dockerfile
-├── index.html
+│
+├── nginx/
+│   ├── Dockerfile
+│   └── index.html
+│
 ├── script.sh
 ├── Jenkinsfile
 └── README.md
-
-
----
-
-## Architecture Flow
-
-Developer
-|
-GitHub
-|
-Jenkins Controller
-|
-Jenkins Agent (node-02)
-|
-Docker
-|
-Nginx Container
-|
-Browser (HTML Page)
-
+```
 
 ---
 
-## Prerequisites
+## 📄 File Explanations
 
-### Jenkins Controller Machine
-- Jenkins installed and running
-- Git plugin installed
-- Node-02 configured as Jenkins agent
-- GitHub Personal Access Token stored in Jenkins credentials
+### 🔹 `nginx/Dockerfile`
+
+* Uses official Nginx image
+* Copies `index.html` into web root
+* Exposes port 80
+
+### 🔹 `nginx/index.html`
+
+* Simple static webpage
+* Used to verify successful deployment
+
+### 🔹 `script.sh`
+
+* Automates Docker build and run
+* Stops old containers safely
+* Ensures clean redeployment
+
+### 🔹 `Jenkinsfile`
+
+* Defines pipeline stages
+* Uses **node-02** as agent
+* Pulls code from GitHub
+* Executes Docker commands
+
+---
+
+## ⚙️ Prerequisites
+
+### Jenkins Controller
+
+* Jenkins installed
+* Git plugin enabled
+* GitHub credentials configured (PAT)
 
 ### Jenkins Agent (node-02)
-- Linux machine
-- Docker installed
-- Jenkins user exists
-- Jenkins user added to Docker group
 
-```bash
-sudo usermod -aG docker jenkins
-sudo systemctl restart docker
+* Docker installed
+* Jenkins user created
+* Agent connected and **ONLINE**
+
+> ❗ Jenkins **does NOT need to be installed** on node-02
 
 ---
-### Jenkins Agent Configuration (node-02)
-Name: node-02
 
-Description:
-Docker-enabled Jenkins agent for CI pipelines and containerized builds
+## 🔐 GitHub Authentication (PAT)
 
-Remote root directory:
-/home/jenkins
+This project uses **GitHub Personal Access Token (PAT)** for secure authentication.
 
-Labels:
-docker-agent linux
+Configured in:
 
-Usage:
-Only build jobs with label expressions matching this node
+```
+Jenkins → Manage Jenkins → Credentials → Global
+```
 
-Launch method:
-Launch agents via SSH
+Credential Type:
 
-This allows future pipelines to target this node reliably.
+* **Username with password**
+* Username: your GitHub username
+* Password: GitHub PAT
+
 ---
 
-GitHub Repository Setup
-Create a new GitHub repository
+## ▶️ Jenkins Pipeline Configuration
 
-Push the project files to the main branch
+### Job Type
 
-Repository URL format:
+* **Pipeline**
 
-https://github.com/<YOUR_GITHUB_USERNAME>/nginx-docker-jenkins.git
-GitHub Personal Access Token (PAT)
-Used by Jenkins to authenticate securely with GitHub.
+### Pipeline Definition
 
-PAT Scope
-repo
+* Pipeline script from SCM
 
-Jenkins Credential Configuration
-Kind: Username with password
+### SCM Settings
 
-Username: Your GitHub username
-
-Password: GitHub Personal Access Token
-
-ID: github-pat
-
-Scope: Global
-
-Credentials are managed centrally by Jenkins, not per agent.
-
-Jenkins Job Configuration
-Job Type: Pipeline
-
-Definition: Pipeline script from SCM
-
+```
 SCM: Git
-
-Repository URL:
-
-https://github.com/<YOUR_GITHUB_USERNAME>/nginx-docker-jenkins.git
+Repository URL: https://github.com/<YOUR_USERNAME>/nginx-docker-jenkins.git
 Credentials: github-pat
+Branch: */main
+```
 
-Branch Specifier:
+### Agent Label
 
-*/main
-Jenkinsfile
-pipeline {
-    agent { label 'docker-agent' }
+```
+node-02
+```
 
-    stages {
-        stage('Clone Repository') {
-            steps {
-                git branch: 'main',
-                    url: 'https://github.com/<YOUR_GITHUB_USERNAME>/nginx-docker-jenkins.git'
-            }
-        }
+---
 
-        stage('Build and Run Docker Container') {
-            steps {
-                sh 'chmod +x script.sh'
-                sh './script.sh'
-            }
-        }
-    }
-}
-Dockerfile
-FROM nginx:alpine
+## 🌐 Output
 
-COPY index.html /usr/share/nginx/html/index.html
+After a successful build:
 
-EXPOSE 80
-script.sh
-#!/bin/bash
+* Docker container runs on **node-02**
+* Nginx serves the web page
+* App is accessible via browser
 
-docker build -t nginx-demo .
-docker run -d -p 8080:80 --name nginx-demo-container nginx-demo
-How to Run the Project
-Ensure Jenkins agent (node-02) is ONLINE
+Example:
 
-Trigger the Jenkins pipeline
+```
+http://<node-02-ip>:8080
+```
 
-Jenkins schedules the job on node-02
+---
 
-Docker image is built
+## 📸 Suggested Screenshots (Highly Recommended)
 
-Docker container is started
+Add these screenshots to make the project more professional:
 
-Access the Application
-Open a browser and visit:
+1. **GitHub Repository Structure**
+2. **Jenkins Pipeline Configuration Page**
+3. **Jenkins Successful Build Console Output**
+4. **Nodes Page Showing node-02 ONLINE**
+5. **Docker Containers Running on node-02 (`docker ps`)**
+6. **Web App Output in Browser**
 
-http://<NODE-02-IP>:8080
-You should see the HTML page served by Nginx.
+> 📁 Store screenshots inside a `/screenshots` folder
 
-Expected Jenkins Output
-Git repository cloned successfully
+---
 
-Docker image built without errors
+## 🧠 What This Project Demonstrates
 
-Docker container running
+✅ Real CI/CD workflow
 
-Jenkins build marked SUCCESS
+✅ Jenkins controller–agent architecture
 
-Verification on Agent
-Run on node-02:
+✅ Dockerized deployments
 
-docker ps
-You should see the Nginx container running.
+✅ Secure GitHub authentication
 
-Screenshots to Include (Recommended)
-Jenkins Dashboard showing the pipeline
+✅ Industry-relevant DevOps skills
 
-Node-02 configuration page
+---
 
-Nodes page showing agent metrics (disk, architecture, uptime)
+## 🚀 Possible Enhancements
 
-Jenkins console output (SUCCESS)
+* Push image to Docker Hub
+* Add version tagging
+* Integrate Nginx reverse proxy
+* Add Kubernetes deployment
+* Add Ansible-based provisioning
 
-docker ps output on node-02
+---
 
-Browser showing HTML page
+## 👤 Author
 
-Why This Project Is Important
-This project demonstrates:
+**Shivam Ubale**
+Aspiring DevOps Engineer
 
-Jenkins controller–agent architecture
+---
 
-Secure credential usage
+## ⭐ Final Notes
 
-Docker-based CI workflows
+This project is intentionally simple but **architecturally correct**.
 
-Real execution on a remote node
+It’s perfect for:
 
-Clean separation of responsibilities
+* Freshers
+* DevOps learners
+* Resume projects
+* Interview discussions
 
-It is ideal for DevOps fresher roles and forms a strong foundation for advanced CI/CD projects.
-
-Author
-Shivam Ubale
+If you understand this project end-to-end, you are **already ahead of many beginners**.
