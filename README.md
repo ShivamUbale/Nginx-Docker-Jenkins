@@ -221,11 +221,9 @@ http://<node-02-ip>:8080
 
 | Screenshot                                       | Description                                   |
 | ------------------------------------------------ | --------------------------------------------- |
-| ![Screenshot1](screenshots/jenkins-pipeline.png) | Jenkins pipeline configuration page           |
-| ![Screenshot2](screenshots/build-console.png)    | Jenkins console output after successful build |
-| ![Screenshot3](screenshots/node-02-online.png)   | Node-02 online status in Jenkins              |
-| ![Screenshot4](screenshots/docker-ps.png)        | Docker container running on node-02           |
-| ![Screenshot5](screenshots/browser-output.png)   | Nginx web page displayed in browser           |
+| ![Screenshot1](screenshots/node-02-online.png)   | Node-02 online status in Jenkins              |
+| ![Screenshot2](screenshots/docker-ps.png)        | Docker container running on node-02           |
+| ![Screenshot3](screenshots/browser-output.png)   | Nginx web page displayed in browser           |
 
 
 ---
