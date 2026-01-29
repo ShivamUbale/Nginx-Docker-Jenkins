@@ -217,7 +217,7 @@ docker ps
 http://<node-02-ip>:8080
 ```
 
-### Suggested Screenshots
+### Screenshots
 
 | Screenshot                                       | Description                                   |
 | ------------------------------------------------ | --------------------------------------------- |
@@ -227,7 +227,6 @@ http://<node-02-ip>:8080
 | ![Screenshot4](screenshots/docker-ps.png)        | Docker container running on node-02           |
 | ![Screenshot5](screenshots/browser-output.png)   | Nginx web page displayed in browser           |
 
-> 📁 Place all screenshots inside a `/screenshots` folder
 
 ---
 
